@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import update as sqlalchemy_update # To avoid confusion with schema update models
+from fastapi import HTTPException, status # For raising exceptions
 from . import models, schemas
 from passlib.context import CryptContext
 
@@ -12,6 +13,10 @@ def get_password_hash(password: str) -> str:
 def get_user(db: Session, user_id: int) -> models.User | None:
     return db.query(models.User).filter(models.User.id == user_id).first()
 
+# --- Profile CRUD ---
+# Removed duplicate function definitions and internal imports
+# The correct version of get_profile_by_user_id is kept below
+
 def get_user_by_email(db: Session, email: str) -> models.User | None:
     return db.query(models.User).filter(models.User.email == email).first()
 
@@ -22,14 +27,6 @@ def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     db.commit()
     db.refresh(db_user)
     return db_user
-
-# --- Profile CRUD ---
-def get_profile_by_user_id(db: Session, user_id: int) -> models.Profile | None:
-from fastapi import HTTPException, status # For raising exceptions
-
-# --- Profile CRUD ---
-def get_profile_by_user_id(db: Session, user_id: int) -> models.Profile | None:
-from sqlalchemy.orm import selectinload # For eager loading
 
 # --- Profile CRUD ---
 def get_profile_by_user_id(db: Session, user_id: int) -> models.Profile | None:
