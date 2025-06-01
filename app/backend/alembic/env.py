@@ -15,13 +15,6 @@ from app.models import User, Profile, Experience, Education
 # access to the values within the .ini file in use.
 config = context.config
 
-# Set the sqlalchemy.url in the Alembic config object if not already set by alembic.ini
-# This ensures that env.py uses the same URL as defined in database.py,
-# especially if alembic.ini is not perfectly synced or for programmatic configuration.
-# However, the primary source should be alembic.ini as configured earlier.
-if not config.get_main_option("sqlalchemy.url"):
-    config.set_main_option("sqlalchemy.url", DATABASE_URL)
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -69,12 +62,12 @@ def run_migrations_online() -> None:
 
     """
     # Fetch DB_URL from environment variable or alembic.ini
-    DB_URL = os.getenv('SUPABASE_DB_URL', config.get_main_option("sqlalchemy.url"))
+    actual_db_url = DATABASE_URL # This is imported from app.database at the top of the file
 
     # If using engine_from_config, ensure it uses the fetched DB_URL.
     # Create a new dictionary for engine configuration or update existing one.
     engine_config = config.get_section(config.config_ini_section, {})
-    engine_config['sqlalchemy.url'] = DB_URL  # Override with SUPABASE_DB_URL if available
+    engine_config['sqlalchemy.url'] = actual_db_url  # Override with SUPABASE_DB_URL if available
 
     connectable = engine_from_config(
         engine_config,  # Use the modified config

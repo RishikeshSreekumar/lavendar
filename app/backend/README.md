@@ -26,16 +26,23 @@ This document provides instructions on how to set up and run the backend applica
     ```
 
 4.  **Set Environment Variables:**
-    You need to configure the `SUPABASE_DB_URL` environment variable. This URL is provided by your Supabase project.
+
+    ### Database Configuration
+
+    **Local Development (Default: SQLite)**
+
+    For local development, the application is configured to use a SQLite database by default. The database file (`local.db`) will be created automatically in the `app/backend` directory when you run migrations or start the application if it doesn't already exist. No specific environment variables are required for this default setup.
+
+    **Using a PostgreSQL Database (e.g., Supabase - Optional)**
+
+    If you prefer to use a PostgreSQL database (like one hosted on Supabase), you can set the `SUPABASE_DB_URL` environment variable. If this variable is set, it will override the default SQLite configuration.
+
     *   **Finding your Supabase Database URL:**
         1.  Go to your Supabase project dashboard.
         2.  Navigate to **Project Settings** (the gear icon).
         3.  Click on **Database** in the sidebar.
         4.  Under **Connection string**, find the string that starts with `postgresql://postgres:[YOUR-PASSWORD]@[AWS-REGION].supabase.co:[PORT]/postgres`. Use this entire string.
-
     *   **Setting the Environment Variable:**
-        You can set this variable in your shell, in a `.env` file (if the application is configured to load it - typically using a library like `python-dotenv`, which is not currently listed in requirements, so manual export is safer), or through your deployment environment's configuration.
-
         Example (for bash/zsh):
         ```bash
         export SUPABASE_DB_URL="your_supabase_connection_string_here"
@@ -43,10 +50,11 @@ This document provides instructions on how to set up and run the backend applica
         Ensure this variable is set in the terminal session where you run the application.
 
 5.  **Run Database Migrations:**
-    The backend uses Alembic to manage database migrations. After setting up your `SUPABASE_DB_URL`, run the following command from the `app/backend` directory to apply any pending migrations:
+    The backend uses Alembic to manage database migrations. After setting up your database configuration, run the following command from the `app/backend` directory to apply any pending migrations:
     ```bash
     alembic upgrade head
     ```
+    For the default SQLite setup, if the `local.db` file does not exist, this command (or running the application) will create it automatically. If you are using `SUPABASE_DB_URL`, ensure the database is created on the server before running migrations.
     If you are setting up the database for the first time, this will create all the necessary tables.
 
 6.  **Run the Application:**
