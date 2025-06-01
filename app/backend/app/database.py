@@ -7,7 +7,9 @@ from sqlalchemy.orm import sessionmaker
 # Consider using environment variables for this.
 # Example for PostgreSQL: "postgresql://user:password@host:port/dbname"
 # Example for SQLite (for local development): "sqlite:///./test.db"
-DATABASE_URL = os.environ.get("SUPABASE_DB_URL", "sqlite:///./local.db") # FIXME: Placeholder, user must configure
+DATABASE_URL = os.environ.get("SUPABASE_DB_URL")
+if DATABASE_URL is None:
+    raise RuntimeError("SUPABASE_DB_URL environment variable not set. Please configure it for PostgreSQL.")
 
 engine = create_engine(DATABASE_URL)
 
