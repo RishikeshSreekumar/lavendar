@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -67,8 +68,16 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Fetch DB_URL from environment variable or alembic.ini
+    DB_URL = os.getenv('SUPABASE_DB_URL', config.get_main_option("sqlalchemy.url"))
+
+    # If using engine_from_config, ensure it uses the fetched DB_URL.
+    # Create a new dictionary for engine configuration or update existing one.
+    engine_config = config.get_section(config.config_ini_section, {})
+    engine_config['sqlalchemy.url'] = DB_URL  # Override with SUPABASE_DB_URL if available
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        engine_config,  # Use the modified config
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
@@ -78,6 +87,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             render_as_batch=True # Added for SQLite compatibility if used
+            # Ensure the url parameter is not redundantly passed if connection is primary
         )
 
         with context.begin_transaction():
